@@ -9,7 +9,6 @@ public class PlayerAnimatorController : MonoBehaviour
     private void Awake()
     {
         if (animator == null) animator = GetComponent<Animator>();
-
         if (playerController == null) playerController = GetComponent<PlayerController2D>();
     }
 
@@ -26,26 +25,35 @@ public class PlayerAnimatorController : MonoBehaviour
         animator.SetBool("IsRunning", playerController.IsRunning());
         animator.SetBool("IsCrouching", playerController.IsCrouching());
 
+        // Climb
+        bool isClimbing = playerController.IsClimbing();
+        float climbSpeed = playerController.GetClimbSpeed();
+
+        animator.SetBool("IsClimbing", isClimbing);
+        animator.SetFloat("ClimbSpeed", climbSpeed);
+
         // Velocidad
         animator.SetFloat("Speed", playerController.GetSpeed());
-
-        // Velocidad vertical para animación de caída/salto
         animator.SetFloat("VerticalVelocity", playerController.GetVerticalVelocity());
 
-        // Jump count para diferenciar primer y segundo salto
+        // Jump count
         animator.SetInteger("JumpCount", playerController.GetJumpCount());
 
-        // Triggers para transiciones específicas
-        if (playerController.GetJumpCount() == 1 && !playerController.IsGrounded()) animator.SetBool("IsJumping", true); // Primer salto
-        else animator.SetBool("IsJumping", false);
+        // Jumping states
+        if (playerController.GetJumpCount() == 1 && !playerController.IsGrounded())
+            animator.SetBool("IsJumping", true);
+        else
+            animator.SetBool("IsJumping", false);
 
-        if (playerController.GetJumpCount() == 2) animator.SetBool("IsDoubleJumping", true); // Segundo salto
-        else animator.SetBool("IsDoubleJumping", false);
+        if (playerController.GetJumpCount() == 2)
+            animator.SetBool("IsDoubleJumping", true);
+        else
+            animator.SetBool("IsDoubleJumping", false);
 
-
-        // Detectar si está cayendo
-        if (!playerController.IsGrounded() && playerController.GetVerticalVelocity() < -0.1f) animator.SetBool("IsFalling", true); // Velocidad negativa, caída
-        else animator.SetBool("IsFalling", false);
-
+        // Falling
+        if (!playerController.IsGrounded() && !playerController.IsClimbing() && playerController.GetVerticalVelocity() < -0.1f)
+            animator.SetBool("IsFalling", true);
+        else
+            animator.SetBool("IsFalling", false);
     }
 }
